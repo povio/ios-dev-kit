@@ -11,14 +11,17 @@ import PulseLogHandler
 
 public struct ToolsListView: View {
   let store: LoggerStore
+  let customTools: [CustomTool]
   
-  public init(store: LoggerStore) {
+  public init(store: LoggerStore, customTools: [CustomTool] = []) {
     self.store = store
+    self.customTools = customTools
   }
   
   public var body: some View {
     List {
       networkLoggerRow
+      customToolsRows
     }
     .listStyle(InsetGroupedListStyle())
   }
@@ -32,6 +35,20 @@ private extension ToolsListView {
         Image(systemName: "network")
           .foregroundColor(.accentColor)
         Text("Pulse Network Logger")
+      }
+    }
+  }
+  
+  @ViewBuilder
+  var customToolsRows: some View {
+    ForEach(customTools.indices, id: \.self) { index in
+      let tool = customTools[index]
+      NavigationLink(destination: tool.view) {
+        HStack {
+          Image(systemName: tool.icon)
+            .foregroundColor(.accentColor)
+          Text(tool.title)
+        }
       }
     }
   }

@@ -9,6 +9,7 @@ import Logging
 public final class PovioDevKit {
   public static let shared = PovioDevKit()
   private let store: LoggerStore
+  private var customTools: [CustomTool] = []
 
   private init() {
     let caches  = FileManager.default
@@ -20,7 +21,9 @@ public final class PovioDevKit {
     self.store = try! LoggerStore(storeURL: storeURL)
   }
 
-  public func start() {
+  public func start(customTools: [CustomTool] = []) {
+    self.customTools = customTools
+    
     LoggingSystem.bootstrap { label in
       var handler = PersistentLogHandler(label: label, store: self.store)
       handler.logLevel = .trace
@@ -33,6 +36,7 @@ public final class PovioDevKit {
       self?.presentConsole()
     }
   }
+  
   public func consoleView() -> some View {
     ConsoleView(store: store)
   }
@@ -40,10 +44,10 @@ public final class PovioDevKit {
   private func presentConsole() {
     guard let rootViewController else { return }
 
-    if let host = rootViewController.presentedViewController as? UIHostingController<DevKitTabView> {
+    if let _ = rootViewController.presentedViewController as? UIHostingController<DevKitTabView> {
       rootViewController.dismiss(animated: true)
     } else {
-      let rootView = DevKitTabView(store: store)
+      let rootView = DevKitTabView(store: store, customTools: customTools)
       let host = UIHostingController(rootView: rootView)
       host.modalPresentationStyle = .fullScreen
       rootViewController.present(host, animated: true)
