@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Pulse
 import PulseUI
 import PulseLogHandler
 
@@ -14,7 +15,7 @@ public struct DevKitTabView: View {
   let store: LoggerStore
   let customTools: [CustomTool]
 
-  public init(store: LoggerStore, customTools: [CustomTool] = []) {
+  public init(store: LoggerStore = .shared, customTools: [CustomTool] = []) {
     self.store = store
     self.customTools = customTools
   }
