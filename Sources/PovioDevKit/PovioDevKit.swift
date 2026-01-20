@@ -10,6 +10,7 @@ public final class PovioDevKit {
   public static let shared = PovioDevKit()
   private let store: LoggerStore
   private var customTools: [CustomTool] = []
+  private var networkFilterConfig: NetworkFilterConfig?
 
   private init() {
     let caches  = FileManager.default
@@ -21,8 +22,9 @@ public final class PovioDevKit {
     self.store = try! LoggerStore(storeURL: storeURL)
   }
 
-  public func start(customTools: [CustomTool] = []) {
+  public func start(customTools: [CustomTool] = [], networkFilter: NetworkFilterConfig? = nil) {
     self.customTools = customTools
+    self.networkFilterConfig = networkFilter
     
     LoggingSystem.bootstrap { label in
       var handler = PersistentLogHandler(label: label, store: self.store)
@@ -30,7 +32,7 @@ public final class PovioDevKit {
       return handler
     }
 
-    URLSessionProxyDelegate.enableAutomaticRegistration(logger: networkLogger)
+    URLSessionProxyDelegate.enableAutomaticRegistration(logger: createNetworkLogger(filter: networkFilter))
 
     ShakeTrigger().subscribe { [weak self] in
       self?.presentConsole()
@@ -62,7 +64,19 @@ public final class PovioDevKit {
       .rootViewController
   }
 
-  private var networkLogger: NetworkLogger {
-    NetworkLogger(store: store)
+  private func createNetworkLogger(filter: NetworkFilterConfig?) -> NetworkLogger {
+    NetworkLogger(store: store) { config in
+      if let filter = filter {
+        if !filter.includedHosts.isEmpty {
+          config.includedHosts = Set(filter.includedHosts)
+        }
+        if !filter.excludedHosts.isEmpty {
+          config.excludedHosts = Set(filter.excludedHosts)
+        }
+        if !filter.excludedURLs.isEmpty {
+          config.excludedURLs = Set(filter.excludedURLs)
+        }
+      }
+    }
   }
 }
