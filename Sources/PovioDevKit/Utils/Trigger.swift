@@ -7,10 +7,12 @@
 
 import UIKit
 
+@MainActor
 public protocol Trigger {
   func subscribe(on event: @escaping () -> Void)
 }
 
+@MainActor
 public struct ShakeTrigger: Trigger {
   public init() {}
   
@@ -20,6 +22,7 @@ public struct ShakeTrigger: Trigger {
   }
 }
 
+@MainActor
 private final class MotionInterceptor {
   static let shared = MotionInterceptor()
   var onShake: (() -> Void)?

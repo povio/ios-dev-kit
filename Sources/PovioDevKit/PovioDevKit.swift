@@ -6,6 +6,7 @@ import PulseUI
 import PulseLogHandler
 import Logging
 
+@MainActor
 public final class PovioDevKit {
   public static let shared = PovioDevKit()
   private let store: LoggerStore

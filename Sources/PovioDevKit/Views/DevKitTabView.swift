@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Pulse
 import PulseUI
 import PulseLogHandler
 
