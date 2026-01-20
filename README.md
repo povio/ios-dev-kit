@@ -27,7 +27,77 @@ Shake to reveal a customizable Tab-view of tools—starting with a full [Pulse](
 
 ## 🚀 Quick Start
 
-### 1. Bootstrap in AppDelegate
+### Option A: SwiftUI Setup (Recommended)
+
+The simplest way to integrate PovioDevKit in a SwiftUI app is with a single modifier:
+
+```swift
+import SwiftUI
+import PovioDevKit
+
+@main
+struct MyApp: App {
+  var body: some Scene {
+    WindowGroup {
+      ContentView()
+        #if !PRODUCTION
+        .withDevKit()
+        #endif
+    }
+  }
+}
+```
+
+That's it! The `.withDevKit()` modifier:
+- Registers network logging automatically
+- Listens for shake gestures
+- Presents the DevKit console as a sheet
+
+#### Custom Tools
+
+Pass custom tools to add your own debug views:
+
+```swift
+.withDevKit(customTools: [
+  CustomTool(title: "Feature Flags", icon: "flag") {
+    FeatureFlagsView()
+  }
+])
+```
+
+#### Manual Control (Alternative)
+
+For more control over presentation, use the `.onShake` modifier directly:
+
+```swift
+import SwiftUI
+import PovioDevKit
+import Pulse
+
+@main
+struct MyApp: App {
+  @State private var showDevKit = false
+  
+  var body: some Scene {
+    WindowGroup {
+      ContentView()
+        #if !PRODUCTION
+        .onShake { showDevKit = true }
+        .sheet(isPresented: $showDevKit) {
+          DevKitTabView()
+        }
+        .onAppear {
+          URLSessionProxyDelegate.enableAutomaticRegistration(logger: .shared)
+        }
+        #endif
+    }
+  }
+}
+```
+
+---
+
+### Option B: UIKit / AppDelegate Setup
 
 ```swift
 import UIKit
