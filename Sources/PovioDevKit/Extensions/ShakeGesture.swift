@@ -18,6 +18,7 @@ extension UIDevice {
 extension UIWindow {
   /// Override the default behavior of shake gestures to post our notification.
   override open func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+    super.motionEnded(motion, with: event)
     if motion == .motionShake {
       NotificationCenter.default.post(name: UIDevice.deviceDidShakeNotification, object: nil)
     }
